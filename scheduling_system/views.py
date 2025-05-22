@@ -3,17 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
 from .forms import TherapistRegistrationForm, ParentRegistrationForm
-from .models import Therapist, Parent
+from .models import Therapist, Parent, Child
 
 
-# Index / Home Page
 def index(request):
     return render(request, 'scheduling_system/index.html')
 
-
-# --------------------------
-# Login / Logout
-# --------------------------
 
 def login_view(request):
     if request.method == 'POST':
@@ -45,10 +40,6 @@ def logout_view(request):
     logout(request)
     return redirect('login_view')
 
-
-# --------------------------
-# Group checks
-# --------------------------
 
 def is_admin(user):
     return user.groups.filter(name='Admin').exists()
@@ -82,10 +73,6 @@ def is_parent(user):
 #     return render(request, 'scheduling_system/parent_dashboard.html')
 
 
-# --------------------------
-# Registration Views
-# --------------------------
-
 def register_therapist(request):
     if request.method == 'POST':
         form = TherapistRegistrationForm(request.POST)
@@ -95,18 +82,21 @@ def register_therapist(request):
                 email=form.cleaned_data['email'],
                 password=form.cleaned_data['password']
             )
+            user.first_name = form.cleaned_data['name']
+            user.save()
+
             group, _ = Group.objects.get_or_create(name='Therapist')
             user.groups.add(group)
 
             Therapist.objects.create(
                 user=user,
-                name=form.cleaned_data['name'],
                 phone_number=form.cleaned_data['phone_number'],
-                specialization=form.cleaned_data['specialization']
+                specialization=form.cleaned_data['specialization'],
+                experience_years=form.cleaned_data['experience_years'],
+
             )
 
-            login(request, user)
-            return redirect('therapist_dashboard')  # or wherever you want
+            return redirect('login_view')
     else:
         form = TherapistRegistrationForm()
 
@@ -125,14 +115,21 @@ def register_parents(request):
             group, _ = Group.objects.get_or_create(name='Parent')
             user.groups.add(group)
 
-            Parent.objects.create(
+            parent = Parent.objects.create(
                 user=user,
-                name=form.cleaned_data['name'],
                 phone_number=form.cleaned_data['phone_number']
             )
 
+            # Create child
+            Child.objects.create(
+                parent=parent,
+                name=form.cleaned_data['child_name'],
+                age=form.cleaned_data['child_age'],
+                diagnosis=form.cleaned_data['child_diagnosis']
+            )
+
             login(request, user)
-            return redirect('parent_dashboard')  # or wherever you want
+            return redirect('parent_dashboard')
     else:
         form = ParentRegistrationForm()
 

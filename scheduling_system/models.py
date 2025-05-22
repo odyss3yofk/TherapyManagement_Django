@@ -7,21 +7,20 @@ from django.contrib.auth.models import User
 
 class Therapist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15)
     specialization = models.CharField(max_length=100)
     experience_years = models.IntegerField()
-    phone = models.CharField(max_length=15)
-    available_days = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.user.get_full_name() or self.user.username
 
 
 class Parent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15)
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.user.get_full_name() or self.user.username
 
 
 class Child(models.Model):
