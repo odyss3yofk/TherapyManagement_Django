@@ -10,6 +10,15 @@ class Therapist(models.Model):
     phone_number = models.CharField(max_length=15)
     specialization = models.CharField(max_length=100)
     experience_years = models.IntegerField()
+    availability = models.CharField(
+        max_length=20,
+        choices=[
+            ('morning', 'Morning'),
+            ('afternoon', 'Afternoon'),
+            ('evening', 'Evening')
+        ],
+        default='morning'
+    )
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
@@ -18,6 +27,7 @@ class Therapist(models.Model):
 class Parent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username

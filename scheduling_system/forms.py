@@ -1,4 +1,5 @@
 from django import forms
+from .models import Therapist
 
 
 class TherapistRegistrationForm(forms.Form):
@@ -22,3 +23,16 @@ class ParentRegistrationForm(forms.Form):
     child_age = forms.IntegerField(label="Child's Age", min_value=0)
     child_diagnosis = forms.CharField(
         max_length=200, label="Child's Diagnosis")
+
+
+class TherapistEditForm(forms.ModelForm):
+    class Meta:
+        model = Therapist
+        fields = ['phone_number', 'specialization',
+                  'experience_years', 'availability']
+        widgets = {
+            'phone_number': forms.TextInput(attrs={'class': 'input', 'placeholder': 'Phone Number'}),
+            'specialization': forms.TextInput(attrs={'class': 'input', 'placeholder': 'Specialization'}),
+            'experience_years': forms.NumberInput(attrs={'class': 'input', 'placeholder': 'Experience (Years)'}),
+            'availability': forms.Select(attrs={'class': 'input'}),
+        }

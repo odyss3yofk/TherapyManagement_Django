@@ -8,7 +8,10 @@ urlpatterns = [
     path('register/therapist/', views.register_therapist,
          name='register_therapist'),
     path('register/parents/', views.register_parents, name='register_parents'),
-    # path('/logout/', views.logout, name='logout'),
+    path('login/therapist/', views.therapist_dashboard,
+         name='therapist_dashboard'),
+    path('logout/', views.logout_view, name='logout_view'),
+    path('profile/', views.profile, name='profile'),
     # path('/dashboard/', views.dashboard, name='dashboard'),
 
 
