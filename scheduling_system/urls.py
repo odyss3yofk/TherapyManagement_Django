@@ -10,6 +10,7 @@ urlpatterns = [
     path('register/parents/', views.register_parents, name='register_parents'),
     path('login/therapist/', views.therapist_dashboard,
          name='therapist_dashboard'),
+    path('login/parents/', views.parent_dashboard, name='parent_dashboard'),
     path('logout/', views.logout_view, name='logout_view'),
     path('profile/', views.profile, name='profile'),
     # path('/dashboard/', views.dashboard, name='dashboard'),

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
-from .forms import TherapistRegistrationForm, ParentRegistrationForm, TherapistEditForm
+from .forms import TherapistRegistrationForm, ParentRegistrationForm, TherapistEditForm, ParentDashboardForm
 from .models import Therapist, Parent, Child
 
 
@@ -86,10 +86,44 @@ def therapist_dashboard(request):
         'edit_mode': edit_mode
     })
 
-# @login_required
-# @user_passes_test(is_parent)
-# def parent_dashboard(request):
-#     return render(request, 'scheduling_system/parent_dashboard.html')
+
+@login_required
+@user_passes_test(is_parent)
+def parent_dashboard(request):
+    try:
+        parent = Parent.objects.get(user=request.user)
+        child = Child.objects.get(parent=parent)
+    except (Parent.DoesNotExist, Child.DoesNotExist):
+        return redirect('login_view')
+
+    edit_mode = request.GET.get('edit') == 'true'
+
+    if request.method == 'POST':
+        form = ParentDashboardForm(request.POST, instance=parent)
+        if form.is_valid():
+            form.save()
+            # Update child fields manually
+            child.name = form.cleaned_data['child_name']
+            child.age = form.cleaned_data['child_age']
+            child.diagnosis = form.cleaned_data['child_diagnosis']
+            child.save()
+            return redirect('parent_dashboard')
+    else:
+        form = ParentDashboardForm(
+            instance=parent,
+            initial={
+                'child_name': child.name,
+                'child_age': child.age,
+                'child_diagnosis': child.diagnosis,
+            }
+        )
+
+    return render(request, 'scheduling_system/parent_dashboard.html', {
+        'form': form,
+        'parent': parent,
+        'child': child,
+        'edit_mode': edit_mode
+    })
 
 
 def register_therapist(request):
@@ -146,7 +180,6 @@ def register_parents(request):
                 phone_number=form.cleaned_data['phone_number']
             )
 
-            # Create child
             Child.objects.create(
                 parent=parent,
                 name=form.cleaned_data['child_name'],
@@ -166,4 +199,56 @@ def register_parents(request):
 @user_passes_test(is_therapist)
 def profile(request):
     therapist = Therapist.objects.get(user=request.user)
-    return render(request, 'scheduling_system/therapist_dashboard.html', {'therapist': therapist})
+    edit_mode = request.GET.get('edit') == 'true'
+
+    if request.method == 'POST':
+        form = TherapistEditForm(request.POST, instance=therapist)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = TherapistEditForm(instance=therapist)
+
+    return render(request, 'scheduling_system/therapist_dashboard.html', {
+        'therapist': therapist,
+        'form': form,
+        'edit_mode': edit_mode
+    })
+
+
+@login_required
+@user_passes_test(is_parent)
+def profile(request):
+    parent = Parent.objects.get(user=request.user)
+    try:
+        child = Child.objects.get(parent=parent)
+    except Child.DoesNotExist:
+        child = None
+    edit_mode = request.GET.get('edit') == 'true'
+
+    if request.method == 'POST':
+        form = ParentDashboardForm(request.POST, instance=parent)
+        if form.is_valid():
+            form.save()
+            if child:
+                child.name = form.cleaned_data['child_name']
+                child.age = form.cleaned_data['child_age']
+                child.diagnosis = form.cleaned_data['child_diagnosis']
+                child.save()
+            return redirect('profile')
+    else:
+        form = ParentDashboardForm(
+            instance=parent,
+            initial={
+                'child_name': child.name if child else '',
+                'child_age': child.age if child else '',
+                'child_diagnosis': child.diagnosis if child else '',
+            }
+        )
+
+    return render(request, 'scheduling_system/parent_dashboard.html', {
+        'parent': parent,
+        'child': child,
+        'form': form,
+        'edit_mode': edit_mode
+    })
