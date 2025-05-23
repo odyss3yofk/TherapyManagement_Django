@@ -53,15 +53,6 @@ def is_parent(user):
     return user.groups.filter(name='Parent').exists()
 
 
-# --------------------------
-# Dashboards (optional for now)
-# --------------------------
-
-# @login_required
-# @user_passes_test(is_admin)
-# def admin_dashboard(request):
-#     return render(request, 'scheduling_system/admin_dashboard.html')
-
 @login_required
 @user_passes_test(is_therapist)
 def therapist_dashboard(request):
@@ -196,59 +187,54 @@ def register_parents(request):
 
 
 @login_required
-@user_passes_test(is_therapist)
 def profile(request):
-    therapist = Therapist.objects.get(user=request.user)
-    edit_mode = request.GET.get('edit') == 'true'
+    if is_therapist(request.user):
+        therapist = Therapist.objects.get(user=request.user)
+        edit_mode = request.GET.get('edit') == 'true'
+        if request.method == 'POST':
+            form = TherapistEditForm(request.POST, instance=therapist)
+            if form.is_valid():
+                form.save()
+                return redirect('profile')
+        else:
+            form = TherapistEditForm(instance=therapist)
+        return render(request, 'scheduling_system/therapist_dashboard.html', {
+            'therapist': therapist,
+            'form': form,
+            'edit_mode': edit_mode
+        })
 
-    if request.method == 'POST':
-        form = TherapistEditForm(request.POST, instance=therapist)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
+    elif is_parent(request.user):
+        parent = Parent.objects.get(user=request.user)
+        try:
+            child = Child.objects.get(parent=parent)
+        except Child.DoesNotExist:
+            child = None
+        edit_mode = request.GET.get('edit') == 'true'
+        if request.method == 'POST':
+            form = ParentDashboardForm(request.POST, instance=parent)
+            if form.is_valid():
+                form.save()
+                if child:
+                    child.name = form.cleaned_data['child_name']
+                    child.age = form.cleaned_data['child_age']
+                    child.diagnosis = form.cleaned_data['child_diagnosis']
+                    child.save()
+                return redirect('profile')
+        else:
+            form = ParentDashboardForm(
+                instance=parent,
+                initial={
+                    'child_name': child.name if child else '',
+                    'child_age': child.age if child else '',
+                    'child_diagnosis': child.diagnosis if child else '',
+                }
+            )
+        return render(request, 'scheduling_system/parent_dashboard.html', {
+            'parent': parent,
+            'child': child,
+            'form': form,
+            'edit_mode': edit_mode
+        })
     else:
-        form = TherapistEditForm(instance=therapist)
-
-    return render(request, 'scheduling_system/therapist_dashboard.html', {
-        'therapist': therapist,
-        'form': form,
-        'edit_mode': edit_mode
-    })
-
-
-@login_required
-@user_passes_test(is_parent)
-def profile(request):
-    parent = Parent.objects.get(user=request.user)
-    try:
-        child = Child.objects.get(parent=parent)
-    except Child.DoesNotExist:
-        child = None
-    edit_mode = request.GET.get('edit') == 'true'
-
-    if request.method == 'POST':
-        form = ParentDashboardForm(request.POST, instance=parent)
-        if form.is_valid():
-            form.save()
-            if child:
-                child.name = form.cleaned_data['child_name']
-                child.age = form.cleaned_data['child_age']
-                child.diagnosis = form.cleaned_data['child_diagnosis']
-                child.save()
-            return redirect('profile')
-    else:
-        form = ParentDashboardForm(
-            instance=parent,
-            initial={
-                'child_name': child.name if child else '',
-                'child_age': child.age if child else '',
-                'child_diagnosis': child.diagnosis if child else '',
-            }
-        )
-
-    return render(request, 'scheduling_system/parent_dashboard.html', {
-        'parent': parent,
-        'child': child,
-        'form': form,
-        'edit_mode': edit_mode
-    })
+        return redirect('index')
