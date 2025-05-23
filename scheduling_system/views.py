@@ -38,7 +38,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login_view')  # or your login page's URL name
+    return redirect('login_view')
 
 
 def is_admin(user):
