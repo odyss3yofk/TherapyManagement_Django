@@ -2,92 +2,98 @@
 <html lang="en">
 <head>
     {% load static %}
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Therapist Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    
+    <link rel="stylesheet" href="{% static 'css/dashboard_therapist.css' %}" />
 </head>
 <body>
-    <div class="navbar">
-        <div>
-            <a href="/">Home</a>
-            <a href="/sessions/">Sessions</a>
-            <a href="/profile/">Profile</a>
-            <a href="/logout/">Logout</a>
+  <div class="navbar">
+    <a href="/">Home</a>
+    <a href="#">Sessions</a>
+    <a href="#">Profile</a>
+    <a href="/logout/">Logout</a>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      🧑‍⚕️ Therapist Dashboard
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="info-grid">
+        <div class="card">
+          <p class="card-title">Name</p>
+          <p>{{ therapist.user.get_full_name }}</p>
         </div>
-    </div>
+        <div class="card">
+          <p class="card-title">Email</p>
+          <p>{{ therapist.user.email }}</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Phone Number</p>
+          {% if edit_mode %}
+            {{ form.phone_number }}
+          {% else %}
+            <p>{{ therapist.phone_number }}</p>
+          {% endif %}
+        </div>
+        <div class="card">
+          <p class="card-title">Specialization</p>
+          {% if edit_mode %}
+            {{ form.specialization }}
+          {% else %}
+            <p>{{ therapist.specialization }}</p>
+          {% endif %}
+        </div>
+        <div class="card">
+          <p class="card-title">Experience (Years)</p>
+          {% if edit_mode %}
+            {{ form.experience_years }}
+          {% else %}
+            <p>{{ therapist.experience_years }}</p>
+          {% endif %}
+        </div>
+        <div class="card">
+          <p class="card-title">Available Morning</p>
+          {% if edit_mode %}
+            {{ form.available_morning }}
+          {% else %}
+            <p>{{ therapist.available_morning|yesno:"Yes,No" }}</p>
+          {% endif %}
+        </div>
+        <div class="card">
+          <p class="card-title">Available Afternoon</p>
+          {% if edit_mode %}
+            {{ form.available_afternoon }}
+          {% else %}
+            <p>{{ therapist.available_afternoon|yesno:"Yes,No" }}</p>
+          {% endif %}
+        </div>
+        <div class="card">
+          <p class="card-title">Available Evening</p>
+          {% if edit_mode %}
+            {{ form.available_evening }}
+          {% else %}
+            <p>{{ therapist.available_evening|yesno:"Yes,No" }}</p>
+          {% endif %}
+        </div>
+      </div>
 
-    <div class="dashboard-container">
-        <h2>👨‍⚕️ Therapist Dashboard</h2>
-
-        <form method="post">
-            {% csrf_token %}
-            <div class="info-grid">
-                <!-- Name (read-only from User model) -->
-                <div class="card">
-                    <p class="card-title">Name</p>
-                    <p>{{ therapist.user.get_full_name }}</p>
-                </div>
-
-                <!-- Email (read-only from User model) -->
-                <div class="card">
-                    <p class="card-title">Email</p>
-                    <p>{{ therapist.user.email }}</p>
-                </div>
-
-                <!-- Phone Number -->
-                <div class="card">
-                    <p class="card-title">Phone Number</p>
-                    {% if edit_mode %}
-                        {{ form.phone_number }}
-                    {% else %}
-                        <p>{{ therapist.phone_number }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Specialization -->
-                <div class="card">
-                    <p class="card-title">Specialization</p>
-                    {% if edit_mode %}
-                        {{ form.specialization }}
-                    {% else %}
-                        <p>{{ therapist.specialization }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Experience -->
-                <div class="card">
-                    <p class="card-title">Experience (Years)</p>
-                    {% if edit_mode %}
-                        {{ form.experience_years }}
-                    {% else %}
-                        <p>{{ therapist.experience_years }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Availability -->
-                <div class="card">
-                    <p class="card-title">Availability</p>
-                    {% if edit_mode %}
-                        {{ form.availability }}
-                    {% else %}
-                        <p>{{ therapist.get_availability_display }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if edit_mode %}
-                <button type="submit" class="edit-btn">Save</button>
-            {% else %}
-                <a href="?edit=true" class="edit-btn">Edit</a>
-            {% endif %}
-        </form>
-
+      <div class="button-group">
+        {% if edit_mode %}
+          <button type="submit" class="edit-btn">Save</button>
+        {% else %}
+          <a href="?edit=true" class="edit-btn">Edit</a>
+        {% endif %}
         <a href="/logout/" class="logout-btn">Logout</a>
-    </div>
+      </div>
+    </form>
+  </div>
 
-    <footer>
-        &copy; {{ current_year }} Therapy Management. All rights reserved.
-    </footer>
+  <footer>
+    &copy; Therapy Management. All rights reserved.
+  </footer>
 </body>
 </html>

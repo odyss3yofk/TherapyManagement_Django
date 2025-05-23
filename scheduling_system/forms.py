@@ -28,13 +28,21 @@ class ParentRegistrationForm(forms.Form):
 class TherapistEditForm(forms.ModelForm):
     class Meta:
         model = Therapist
-        fields = ['phone_number', 'specialization',
-                  'experience_years', 'availability']
+        fields = [
+            'phone_number',
+            'specialization',
+            'experience_years',
+            'available_morning',
+            'available_afternoon',
+            'available_evening'
+        ]
         widgets = {
             'phone_number': forms.TextInput(attrs={'class': 'input', 'placeholder': 'Phone Number'}),
             'specialization': forms.TextInput(attrs={'class': 'input', 'placeholder': 'Specialization'}),
             'experience_years': forms.NumberInput(attrs={'class': 'input', 'placeholder': 'Experience (Years)'}),
-            'availability': forms.Select(attrs={'class': 'input'}),
+            'available_morning': forms.CheckboxInput(attrs={'class': 'input'}),
+            'available_afternoon': forms.CheckboxInput(attrs={'class': 'input'}),
+            'available_evening': forms.CheckboxInput(attrs={'class': 'input'}),
         }
 
 

@@ -19,7 +19,6 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-
             if user.groups.filter(name='Admin').exists():
                 return redirect('admin_dashboard')
             elif user.groups.filter(name='Therapist').exists():
@@ -32,7 +31,6 @@ def login_view(request):
             return render(request, 'scheduling_system/login.html', {
                 'error': 'Invalid username or password'
             })
-
     return render(request, 'scheduling_system/login.html')
 
 
@@ -137,7 +135,9 @@ def register_therapist(request):
                 phone_number=form.cleaned_data['phone_number'],
                 specialization=form.cleaned_data['specialization'],
                 experience_years=form.cleaned_data['experience_years'],
-
+                available_morning=True,
+                available_afternoon=True,
+                available_evening=True,
             )
 
             return redirect('login_view')

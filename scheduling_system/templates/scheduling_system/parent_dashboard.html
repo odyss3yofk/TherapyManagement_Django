@@ -4,11 +4,12 @@
     {% load static %}
     <meta charset="UTF-8">
     <title>Parent Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard_parent.css' %}">
 </head>
 <body>
+    <!-- Navbar -->
     <div class="navbar">
-        <div>
+        <div class="nav-links">
             <a href="/">Home</a>
             <a href="/sessions/">Sessions</a>
             <a href="/profile/">Profile</a>
@@ -16,80 +17,86 @@
         </div>
     </div>
 
+    <!-- Dashboard Content -->
     <div class="dashboard-container">
         <h2>👨‍👩‍👧 Parent Dashboard</h2>
 
-        <form method="post">
-            {% csrf_token %}
-            <div class="info-grid">
-                <!-- Parent Name -->
-                <div class="card">
-                    <p class="card-title">Name</p>
-                    {% if edit_mode %}
-                        {{ form.name }}
-                    {% else %}
-                        <p>{{ parent.name }}</p>
-                    {% endif %}
+        <div class="dashboard-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="info-grid">
+                    <!-- Parent Name -->
+                    <div class="card">
+                        <p class="card-title">Name</p>
+                        {% if edit_mode %}
+                            {{ form.name }}
+                        {% else %}
+                            <p>{{ parent.name }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Parent Email -->
+                    <div class="card">
+                        <p class="card-title">Email</p>
+                        <p>{{ parent.user.email }}</p>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="card">
+                        <p class="card-title">Phone Number</p>
+                        {% if edit_mode %}
+                            {{ form.phone_number }}
+                        {% else %}
+                            <p>{{ parent.phone_number }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Child Name -->
+                    <div class="card">
+                        <p class="card-title">Child's Name</p>
+                        {% if edit_mode %}
+                            {{ form.child_name }}
+                        {% else %}
+                            <p>{{ child.name }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Child Age -->
+                    <div class="card">
+                        <p class="card-title">Child's Age</p>
+                        {% if edit_mode %}
+                            {{ form.child_age }}
+                        {% else %}
+                            <p>{{ child.age }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Child Diagnosis -->
+                    <div class="card">
+                        <p class="card-title">Child's Diagnosis</p>
+                        {% if edit_mode %}
+                            {{ form.child_diagnosis }}
+                        {% else %}
+                            <p>{{ child.diagnosis }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-
-                <!-- Parent Email -->
-                <div class="card">
-                    <p class="card-title">Email</p>
-                    <p>{{ parent.user.email }}</p>
-                </div>
-
-                <!-- Phone Number -->
-                <div class="card">
-                    <p class="card-title">Phone Number</p>
-                    {% if edit_mode %}
-                        {{ form.phone_number }}
-                    {% else %}
-                        <p>{{ parent.phone_number }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Child Name -->
-                <div class="card">
-                    <p class="card-title">Child's Name</p>
-                    {% if edit_mode %}
-                        {{ form.child_name }}
-                    {% else %}
-                        <p>{{ child.name }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Child Age -->
-                <div class="card">
-                    <p class="card-title">Child's Age</p>
-                    {% if edit_mode %}
-                        {{ form.child_age }}
-                    {% else %}
-                        <p>{{ child.age }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Child Diagnosis -->
-                <div class="card">
-                    <p class="card-title">Child's Diagnosis</p>
-                    {% if edit_mode %}
-                        {{ form.child_diagnosis }}
-                    {% else %}
-                        <p>{{ child.diagnosis }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-
-            {% if edit_mode %}
-                <button type="submit" class="edit-btn">Save</button>
-            {% else %}
-                <a href="?edit=true" class="edit-btn">Edit</a>
-            {% endif %}
-        </form>
-
+    
+ 
+      <div class="button-group">
+        {% if edit_mode %}
+          <button type="submit" class="edit-btn">Save</button>
+        {% else %}
+          <a href="?edit=true" class="edit-btn">Edit</a>
+        {% endif %}
         <a href="/logout/" class="logout-btn">Logout</a>
+      </div>
+
+
+        </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         &copy; {{ current_year }} Therapy Management. All rights reserved.
     </footer>

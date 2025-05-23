@@ -10,15 +10,9 @@ class Therapist(models.Model):
     phone_number = models.CharField(max_length=15)
     specialization = models.CharField(max_length=100)
     experience_years = models.IntegerField()
-    availability = models.CharField(
-        max_length=20,
-        choices=[
-            ('morning', 'Morning'),
-            ('afternoon', 'Afternoon'),
-            ('evening', 'Evening')
-        ],
-        default='morning'
-    )
+    available_morning = models.BooleanField(default=True)
+    available_afternoon = models.BooleanField(default=True)
+    available_evening = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
