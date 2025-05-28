@@ -38,7 +38,11 @@ class Child(models.Model):
 
 
 class TherapySession(models.Model):
-    therapist = models.ForeignKey(Therapist, on_delete=models.CASCADE)
+    therapist = models.ForeignKey(
+        Therapist,
+        on_delete=models.CASCADE,
+        related_name='therapy_sessions'  # <-- Add this line
+    )
     child = models.ForeignKey(Child, on_delete=models.CASCADE)
     date = models.DateField()
     time = models.TimeField()

@@ -1,0 +1,55 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Therapy Sessions</title>
+    <link rel="stylesheet" href="{% static 'css/session_dashboard.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="{% url 'index' %}">Home</a>
+            <a href="{% url 'sessions' %}">Sessions</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <a href="{% url 'logout_view' %}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <h2>📅 Therapy Session</h2>
+
+        {% comment %} <form method="post" class="form-grid">
+            {% csrf_token %}
+            <div class="form-group">{{ form.therapist.label_tag }}{{ form.therapist }}</div>
+            <div class="form-group">{{ form.child.label_tag }}{{ form.child }}</div>
+            <div class="form-group">{{ form.date.label_tag }}{{ form.date }}</div>
+            <div class="form-group">{{ form.time.label_tag }}{{ form.time }}</div>
+            <div class="form-group">{{ form.duration_minutes.label_tag }}{{ form.duration_minutes }}</div>
+            <div class="form-group form-notes">{{ form.notes.label_tag }}{{ form.notes }}</div>
+            <button type="submit" class="save-btn">Save Session</button>
+        </form> {% endcomment %}
+
+        <h3 class="section-heading">Your Scheduled Sessions</h3>
+        <div class="session-list">
+            {% for session in sessions %}
+            <div class="card session-card">
+                <div><span class="card-title">Date:</span> {{ session.date }}</div>
+                <div><span class="card-title">Time:</span> {{ session.time }}</div>
+                <div><span class="card-title">Child:</span> {{ session.child.name }}</div>
+                <div><span class="card-title">Therapist:</span> {{ session.therapist.user.get_full_name }}</div>
+                <div><span class="card-title">Duration:</span> {{ session.duration_minutes }} minutes</div>
+                <div><span class="card-title">Notes:</span> {{ session.notes }}</div>
+            </div>
+            {% empty %}
+            <p class="no-sessions">No sessions scheduled.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer>
+        © Therapy Management. All rights reserved.
+    </footer>
+</body>
+</html>

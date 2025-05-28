@@ -1,5 +1,5 @@
 from django import forms
-from .models import Therapist, Parent, Child
+from .models import Therapist, Parent, Child, TherapySession
 
 
 class TherapistRegistrationForm(forms.Form):
@@ -47,7 +47,7 @@ class TherapistEditForm(forms.ModelForm):
 
 
 class ParentDashboardForm(forms.ModelForm):
-    # Add child fields manually
+
     child_name = forms.CharField(
         max_length=100,
         label="Child's Name",
@@ -73,4 +73,25 @@ class ParentDashboardForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'input', 'placeholder': "Parent's Name"}),
             'phone_number': forms.TextInput(attrs={'class': 'input', 'placeholder': "Phone Number"}),
+        }
+
+
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = TherapySession
+        fields = [
+            'therapist',
+            'child',
+            'date',
+            'time',
+            'duration_minutes',
+            'notes',
+        ]
+        widgets = {
+            'therapist': forms.Select(attrs={'class': 'input'}),
+            'child': forms.Select(attrs={'class': 'input'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'input'}),
+            'time': forms.TimeInput(attrs={'type': 'time', 'class': 'input'}),
+            'duration_minutes': forms.NumberInput(attrs={'class': 'input', 'placeholder': 'Duration (minutes)'}),
+            'notes': forms.Textarea(attrs={'class': 'input', 'placeholder': 'Notes', 'rows': 2}),
         }

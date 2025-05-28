@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
-from .forms import TherapistRegistrationForm, ParentRegistrationForm, TherapistEditForm, ParentDashboardForm
+from .forms import TherapistRegistrationForm, ParentRegistrationForm, TherapistEditForm, ParentDashboardForm, SessionForm
 from .models import Therapist, Parent, Child
 
 
@@ -235,6 +235,35 @@ def profile(request):
             'child': child,
             'form': form,
             'edit_mode': edit_mode
+        })
+    else:
+        return redirect('index')
+
+
+@login_required
+def sessions(request):
+    if is_therapist(request.user):
+        therapist = Therapist.objects.get(user=request.user)
+        if request.method == 'POST':
+            form = SessionForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('sessions')
+        else:
+            form = SessionForm()
+        sessions = therapist.therapy_sessions.all()
+        return render(request, 'scheduling_system/sessions_therapist.html', {
+            'sessions': sessions,
+            'form': form,
+        })
+    elif is_parent(request.user):
+        parent = Parent.objects.get(user=request.user)
+        child = Child.objects.get(parent=parent)
+        sessions = child.therapysession_set.all()
+        # Parents should NOT see the form
+        return render(request, 'scheduling_system/sessions_parents.html', {
+            'sessions': sessions,
+            'form': None,
         })
     else:
         return redirect('index')

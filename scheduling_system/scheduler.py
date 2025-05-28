@@ -17,11 +17,14 @@ def run_scheduler():
     for therapist in therapists:
         for session in sessions:
             if session == "Morning":
-                availability[(therapist.id, session)] = int(therapist.available_morning)
+                availability[(therapist.id, session)] = int(
+                    therapist.available_morning)
             elif session == "Afternoon":
-                availability[(therapist.id, session)] = int(therapist.available_afternoon)
+                availability[(therapist.id, session)] = int(
+                    therapist.available_afternoon)
             elif session == "Evening":
-                availability[(therapist.id, session)] = int(therapist.available_evening)
+                availability[(therapist.id, session)] = int(
+                    therapist.available_evening)
 
     # Create LP model
     model = LpProblem("Therapy_Scheduling", LpMaximize)
@@ -59,12 +62,10 @@ def run_scheduler():
                 model += lpSum(x[(t.id, c, s, child.id)]
                                for child in children) <= 1
 
-    # Solve
     model.solve()
     print(f"Status: {LpStatus[model.status]}")
 
-    # Apply results to DB
-    TherapySession.objects.all().delete()  # Optional: clear existing
+    TherapySession.objects.all().delete()
     for s in sessions:
         for c in courses:
             for child in children:
@@ -74,7 +75,7 @@ def run_scheduler():
                         TherapySession.objects.create(
                             therapist=t,
                             child=child,
-                            date=timezone.now().date(),  # You can set real dates and times here
+                            date=timezone.now().date(),
                             time=timezone.now().time(),
                             duration_minutes=30,
                             notes=f"Assigned to {c} in {s} session"
