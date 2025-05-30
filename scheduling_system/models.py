@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 
 
@@ -51,3 +48,16 @@ class TherapySession(models.Model):
 
     def __str__(self):
         return f"{self.child.name} with {self.therapist.user.username} on {self.date}"
+
+
+class TherapistAttendance(models.Model):
+    therapist = models.ForeignKey('Therapist', on_delete=models.CASCADE)
+    date = models.DateField()
+    present = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('therapist', 'date')
+
+    def __str__(self):
+        return f"{self.therapist.user.username} - {self.date} - {'Present' if self.present else 'Absent'}"
