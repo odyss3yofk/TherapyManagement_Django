@@ -1,0 +1,8 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Run Scheduler</h1>
+  <form method="post">{% csrf_token %}
+    <button type="submit" class="default">Run Scheduler Now</button>
+  </form>
+  <p><a href="../">Back to Therapy Sessions</a></p>
+{% endblock %}

@@ -2,6 +2,11 @@ from django.contrib import admin
 from django.http import HttpResponse
 import csv
 from .models import Therapist, Parent, Child, TherapySession, TherapistAttendance
+from django.urls import path
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.contrib import admin, messages
+from .scheduler import run_scheduler
 
 
 @admin.register(Therapist)
@@ -29,6 +34,25 @@ class TherapySessionAdmin(admin.ModelAdmin):
     search_fields = ('child__name', 'therapist__user__username', 'notes')
     list_filter = ('date', 'therapist')
     date_hierarchy = 'date'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('run-scheduler/', self.admin_site.admin_view(self.run_scheduler_view),
+                 name='run-scheduler'),
+        ]
+        return custom_urls + urls
+
+    def run_scheduler_view(self, request):
+        if request.method == "POST":
+            run_scheduler()
+            self.message_user(
+                request, "Scheduler ran successfully and sessions were created for present therapists.", messages.SUCCESS)
+            return redirect("..")
+        context = dict(
+            self.admin_site.each_context(request),
+        )
+        return TemplateResponse(request, "admin/run_scheduler.html", context)
 
 
 class TherapistAttendanceAdmin(admin.ModelAdmin):

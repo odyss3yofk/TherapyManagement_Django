@@ -80,7 +80,6 @@ class SessionForm(forms.ModelForm):
     class Meta:
         model = TherapySession
         fields = [
-            'therapist',
             'child',
             'date',
             'time',
@@ -88,7 +87,6 @@ class SessionForm(forms.ModelForm):
             'notes',
         ]
         widgets = {
-            'therapist': forms.Select(attrs={'class': 'input'}),
             'child': forms.Select(attrs={'class': 'input'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'input'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'input'}),

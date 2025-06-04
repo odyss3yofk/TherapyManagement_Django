@@ -7,17 +7,17 @@
     <link rel="stylesheet" href="{% static 'css/dashboard_parent.css' %}">
 </head>
 <body>
-    <!-- Navbar -->
+    
     <div class="navbar">
         <div class="nav-links">
             <a href="/">Home</a>
-            <a href="/sessions/">Sessions</a>
+            <a href="{% url 'sessions' %}">Sessions</a>
             <a href="/profile/">Profile</a>
             <a href="/logout/">Logout</a>
         </div>
     </div>
 
-    <!-- Dashboard Content -->
+   
     <div class="dashboard-container">
         <h2>👨‍👩‍👧 Parent Dashboard</h2>
 

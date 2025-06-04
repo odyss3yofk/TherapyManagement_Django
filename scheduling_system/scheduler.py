@@ -1,18 +1,23 @@
 from pulp import LpProblem, LpVariable, LpMaximize, lpSum, LpStatus
 from django.utils import timezone
-from .models import Therapist, Child, TherapySession
+from .models import Therapist, Child, TherapySession, TherapistAttendance
 
 
 def run_scheduler():
-    # Extract data from models
-    therapists = list(Therapist.objects.all())
+    today = timezone.now().date()
+    # Only include therapists who are present today
+    therapists = list(
+        Therapist.objects.filter(
+            therapistattendance__date=today,
+            therapistattendance__present=True
+        ).distinct()
+    )
     children = list(Child.objects.all())
 
-    # Placeholder: extract courses and sessions (extend your models to support these if needed)
-    courses = ["Speech", "Occupational", "Behavioral"]  # Example course names
-    sessions = ["Morning", "Afternoon", "Evening"]  # Example session labels
+    courses = ["Speech", "Occupational", "Behavioral"]
+    sessions = ["Morning", "Afternoon", "Evening"]
 
-    # Therapist availability (you might store this in your DB)
+    # Therapist availability (using BooleanFields)
     availability = {}
     for therapist in therapists:
         for session in sessions:
@@ -26,23 +31,22 @@ def run_scheduler():
                 availability[(therapist.id, session)] = int(
                     therapist.available_evening)
 
-    # Create LP model
     model = LpProblem("Therapy_Scheduling", LpMaximize)
 
-    # Decision variables
     x = {}
     for t in therapists:
         for c in courses:
             for s in sessions:
                 for child in children:
                     x[(t.id, c, s, child.id)] = LpVariable(
-                        f"x_{t.id}_{c}_{s}_{child.id}", cat="Binary")
+                        f"x_{t.id}_{c}_{s}_{child.id}", cat="Binary"
+                    )
 
-    # Objective
-    model += lpSum(x[(t.id, c, s, child.id)]
-                   for t in therapists for c in courses for s in sessions for child in children)
+    model += lpSum(
+        x[(t.id, c, s, child.id)]
+        for t in therapists for c in courses for s in sessions for child in children
+    )
 
-    # Constraints
     for s in sessions:
         for c in courses:
             for child in children:
@@ -75,7 +79,7 @@ def run_scheduler():
                         TherapySession.objects.create(
                             therapist=t,
                             child=child,
-                            date=timezone.now().date(),
+                            date=today,
                             time=timezone.now().time(),
                             duration_minutes=30,
                             notes=f"Assigned to {c} in {s} session"

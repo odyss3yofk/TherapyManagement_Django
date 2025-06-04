@@ -22,7 +22,6 @@
         
         <form method="post" class="form-grid">
             {% csrf_token %}
-            <div class="form-group">{{ form.therapist.label_tag }}{{ form.therapist }}</div>
             <div class="form-group">{{ form.child.label_tag }}{{ form.child }}</div>
             <div class="form-group">{{ form.date.label_tag }}{{ form.date }}</div>
             <div class="form-group">{{ form.time.label_tag }}{{ form.time }}</div>

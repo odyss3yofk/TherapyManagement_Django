@@ -242,28 +242,37 @@ def profile(request):
 
 @login_required
 def sessions(request):
-    if is_therapist(request.user):
-        therapist = Therapist.objects.get(user=request.user)
+    if hasattr(request.user, 'therapist'):
+        therapist = request.user.therapist
         if request.method == 'POST':
             form = SessionForm(request.POST)
             if form.is_valid():
-                form.save()
+                session = form.save(commit=False)
+                session.therapist = therapist
+                session.save()
                 return redirect('sessions')
         else:
             form = SessionForm()
+
         sessions = therapist.therapy_sessions.all()
-        return render(request, 'scheduling_system/sessions_therapist.html', {
-            'sessions': sessions,
-            'form': form,
-        })
+        return render(request, 'scheduling_system/sessions_therapist.html', {'form': form, 'sessions': sessions})
     elif is_parent(request.user):
         parent = Parent.objects.get(user=request.user)
         child = Child.objects.get(parent=parent)
         sessions = child.therapysession_set.all()
-        # Parents should NOT see the form
+
         return render(request, 'scheduling_system/sessions_parents.html', {
             'sessions': sessions,
             'form': None,
         })
+    else:
+        return redirect('index')
+
+
+def profile_sessions(request):
+    if hasattr(request.user, 'therapist'):
+        return redirect('sessions')
+    elif is_parent(request.user):
+        return redirect('sessions')
     else:
         return redirect('index')
