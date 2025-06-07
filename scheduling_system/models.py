@@ -38,7 +38,7 @@ class TherapySession(models.Model):
     therapist = models.ForeignKey(
         Therapist,
         on_delete=models.CASCADE,
-        related_name='therapy_sessions'  # <-- Add this line
+        related_name='therapy_sessions'
     )
     child = models.ForeignKey(Child, on_delete=models.CASCADE)
     date = models.DateField()

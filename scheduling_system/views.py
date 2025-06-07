@@ -1,9 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User, Group
 from .forms import TherapistRegistrationForm, ParentRegistrationForm, TherapistEditForm, ParentDashboardForm, SessionForm
-from .models import Therapist, Parent, Child
+from .models import Therapist, Parent, Child, TherapistAttendance, TherapySession
+from datetime import date
+
+from .scheduler import run_scheduler
+from django.contrib import messages
 
 
 def index(request):
@@ -276,3 +281,46 @@ def profile_sessions(request):
         return redirect('sessions')
     else:
         return redirect('index')
+
+
+@staff_member_required
+def admin_dashboard(request):
+    today = date.today()
+
+    # Present therapists today
+    present_therapist_attendance = TherapistAttendance.objects.filter(
+        date=today, present=True)
+    present_therapists = [
+        att.therapist for att in present_therapist_attendance]
+
+    # Present students (children with sessions today)
+    sessions_today = TherapySession.objects.filter(date=today)
+    present_students = []
+    for session in sessions_today:
+        present_students.append({
+            'child': session.child,
+            'parent': session.child.parent
+        })
+
+    # Dashboard stats
+    total_therapists = Therapist.objects.count()
+    total_parents = Parent.objects.count()
+    total_children = Child.objects.count()
+    total_sessions = TherapySession.objects.count()
+    pending_approvals = 0  # Replace with your logic if needed
+
+    # Run scheduler if button pressed
+    if request.method == 'POST' and 'run_scheduler' in request.POST:
+        run_scheduler()
+        messages.success(request, "Scheduler ran successfully!")
+        return redirect('admin_dashboard')
+
+    return render(request, 'scheduling_system/admin_dashboard.html', {
+        'present_students': present_students,
+        'present_therapists': present_therapists,
+        'total_therapists': total_therapists,
+        'total_parents': total_parents,
+        'total_children': total_children,
+        'total_sessions': total_sessions,
+        'pending_approvals': pending_approvals,
+    })

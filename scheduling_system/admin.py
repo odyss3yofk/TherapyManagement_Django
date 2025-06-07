@@ -34,6 +34,13 @@ class TherapySessionAdmin(admin.ModelAdmin):
     search_fields = ('child__name', 'therapist__user__username', 'notes')
     list_filter = ('date', 'therapist')
     date_hierarchy = 'date'
+    actions = ['delete_selected_sessions']
+
+    def delete_selected_sessions(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f"Deleted {count} selected therapy sessions.", messages.SUCCESS)
+    delete_selected_sessions.short_description = "Delete selected sessions"
 
     def get_urls(self):
         urls = super().get_urls()

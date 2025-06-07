@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}" />
+</head>
+<body>
+  <div class="navbar">
+    <a href="/">Home</a>
+    <a href="{% url 'sessions' %}">Sessions</a>
+    <a href="{% url 'admin_dashboard' %}">Admin Panel</a>
+    <a href="/logout/">Logout</a>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      🛠️ Admin Dashboard
+    </div>
+
+    <div class="info-grid">
+      <div class="card blue">
+        <p class="card-title">Total Therapists</p>
+        <p>{{ total_therapists }}</p>
+      </div>
+      <div class="card blue">
+        <p class="card-title">Total Parents</p>
+        <p>{{ total_parents }}</p>
+      </div>
+      <div class="card blue">
+        <p class="card-title">Total Children</p>
+        <p>{{ total_children }}</p>
+      </div>
+      <div class="card blue">
+        <p class="card-title">Total Sessions</p>
+        <p>{{ total_sessions }}</p>
+      </div>
+      <div class="card orange">
+        <p class="card-title">Pending Approvals</p>
+        <p>{{ pending_approvals }}</p>
+      </div>
+      <div class="card green">
+        <p class="card-title">System Status</p>
+        <p>✅ Operational</p>
+      </div>
+    </div>
+
+    <div class="button-group">
+      {% comment %} <a href="{% url 'manage_users' %}" class="edit-btn">Manage Users</a>
+      <a href="{% url 'view_logs' %}" class="edit-btn">View Logs</a> {% endcomment %}
+      <a href="/logout/" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="present-students">
+      <h2>Present Students Today</h2>
+      <table>
+        <tr>
+          <th>Child Name</th>
+          <th>Parent Name</th>
+        </tr>
+        {% for entry in present_students %}
+        <tr>
+          <td>{{ entry.child.name }}</td>
+          <td>{{ entry.parent.name }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No students present today.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div class="present-therapists">
+      <h2>Present Therapists Today</h2>
+      <ul>
+        {% for therapist in present_therapists %}
+          <li>{{ therapist.user.get_full_name }}</li>
+        {% empty %}
+          <li>No therapists present today.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <form method="post" style="margin-top:2em;">
+      {% csrf_token %}
+      <button type="submit" name="run_scheduler" class="edit-btn">Run Scheduler</button>
+    </form>
+  </div>
+
+  <footer>
+    &copy; Therapy Management. Admin Access. All rights reserved.
+  </footer>
+</body>
+</html>

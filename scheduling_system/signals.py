@@ -13,9 +13,9 @@ def mark_therapist_attendance(sender, user, request, **kwargs):
 
     now = timezone.localtime()
     attendance_time = now.time()
-    if attendance_time >= timezone.datetime.strptime('17:00', '%H:%M').time() and \
-       attendance_time <= timezone.datetime.strptime('17:30', '%H:%M').time():
-        # Mark attendance only if not already marked today
+    if attendance_time >= timezone.datetime.strptime('2:00', '%H:%M').time() and \
+       attendance_time <= timezone.datetime.strptime('3:30', '%H:%M').time():
+
         attendance, created = TherapistAttendance.objects.get_or_create(
             therapist=therapist,
             date=now.date(),

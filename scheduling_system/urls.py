@@ -15,6 +15,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('sessions/', views.sessions, name='sessions'),
     path('profile/sessions', views.profile, name='profile_sessions'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     # path('/dashboard/', views.dashboard, name='dashboard'),
 
 
